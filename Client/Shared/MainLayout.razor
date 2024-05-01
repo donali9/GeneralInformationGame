@@ -1,0 +1,30 @@
+﻿@inherits LayoutComponentBase
+
+<div class="page">
+   @* <div class="sidebar">
+        <NavMenu />
+    </div>
+*@
+    <main>
+        <div id="vue-header" class="quenched">
+            <header class="border-bottom-color:neutral-000000 border-bottom-style:solid border-bottom-width:1 display:block padding-vertical:8">
+                <div class="margin-horizontal:auto max-width:container padding-horizontal:32">
+                    <div class="display:flex position:relative align-items:center justify-content:center">
+                        <h1 style="text-align: center">QUIZ GAME</h1>
+                        <div class="px-4">
+                                <LoginDisplay />
+                        </div>
+                        <NavMenu />
+                        <div class="display:flex align-items:center pos-right:0 position:absolute">
+                            
+                        </div>
+                    </div>
+                </div>
+            </header>
+        </div>
+
+        <article class="content px-4">
+            @Body
+        </article>
+    </main>
+</div>

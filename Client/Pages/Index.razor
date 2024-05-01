@@ -1,0 +1,102 @@
+﻿@using GeneralInformationGame.Shared.Models
+@using GeneralInformationGame.Client.Services
+@using Microsoft.AspNetCore.Components.Authorization
+@page "/"
+@inject NavigationManager navigationManager
+@inject IGameService gameService
+
+<PageTitle>Index</PageTitle>
+
+Your Games List:
+
+@*<SurveyPrompt Title="How is Blazor working for you?" />*@
+<table class="table table-striped table-dark">
+    <thead>
+        <tr>
+            <th scope="col">#</th>
+            <th scope="col">Title</th>
+            <th scope="col">Date</th>
+            <th scope="col">Details</th>
+            <th scope="col">Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if(AllGames != null)
+        {
+            Counter = 0;
+            @foreach (var item in AllGames)
+            {
+                Counter++;
+                <tr>
+                    <th scope="row">@Counter</th>
+                    <td>@item.Name</td>
+                    <td>@item.Date</td>
+                    <td><a href="/gameInfo/@item.Id">Show</a></td>
+                    <td>Continue</td>
+                </tr>
+            }
+        }
+       
+       
+    </tbody>
+</table>
+<nav aria-label="...">
+    <ul class="pagination">
+        @for (int i = 1; i <= PageCount; i++)
+        {
+            if(i == PageIndex)
+            {
+                int num = i;
+                <li class="page-item active"><a class="page-link" @onclick="()=>GetPageGames(num)">@i</a></li>
+            }
+            else{
+                int num = i;
+                <li class="page-item"><a class="page-link" @onclick="()=>GetPageGames(num)">@i</a></li>
+            }
+        }
+    </ul>
+</nav>
+@code
+{
+    [CascadingParameter] private Task<AuthenticationState>? authenticationStateTask { get; set; }
+    public List<GeneralInformationGame.Shared.Models.Game>? AllGames { get; set; }
+    public int Counter { get; set; }
+    public int PageIndex { get; set; }
+    public int PageSize { get; set; } = 10;
+    public int PageCount { get; set; }
+    public int GamesCount { get; set; }
+    public string? UserMail { get; set; }
+}
+
+@functions
+{
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await authenticationStateTask;
+        var user = authState.User;
+
+        if (user.Identity.IsAuthenticated)
+        {
+            UserMail = user.Identity.Name;
+            GamesCount = await gameService.GetGamesCount(UserMail);
+            PageCount = (int)Math.Ceiling(GamesCount / (double)PageSize);
+            await GetPageGames(1);
+        }
+        else
+        {
+            navigationManager.NavigateTo("/Login");
+        }
+       
+    }
+    private async Task GetPageGames(int index)
+    {
+        if(index != PageIndex)
+        {
+            PageIndex = index;
+            AllGames = await gameService.GetAllGames(PageIndex, PageSize, UserMail);
+            this.StateHasChanged();
+        }
+        
+    }
+}

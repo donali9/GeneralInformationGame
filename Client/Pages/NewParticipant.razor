@@ -1,0 +1,31 @@
+﻿@using GeneralInformationGame.Client.Services
+@page "/NewParticipant/{Id:int}"
+@inject IGameService gameService
+@inject NavigationManager NavigationManager
+<h3>NewParticipant</h3>
+<div class="form-group row">
+    <label for="staticCount" class="col-sm-2 col-form-label">Participant Name</label>
+    <div class="col-sm-2">
+        <input @bind="Name" type="text" class="form-control" id="staticCount">
+    </div>
+</div>
+<button @onclick="() => (AddParticipant(new GeneralInformationGame.Shared.Models.Participant()
+{
+Name = Name,
+GameId = Id,
+}))"
+        type="submit" class="btn btn-primary">
+    Submit
+</button>
+@code {
+   [Parameter]
+    public int Id { get; set; }
+    public string Name { get; set; }
+}
+@functions{
+    protected async Task AddParticipant(GeneralInformationGame.Shared.Models.Participant newParticipant)
+    {
+        await gameService.AddParticipant(newParticipant);
+        NavigationManager.NavigateTo($"/GameInfo/{Id}");
+    }
+}

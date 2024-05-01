@@ -1,0 +1,72 @@
+﻿@using GeneralInformationGame.Shared.ViewModels
+@using GeneralInformationGame.Client.Services
+@page "/ShowQuestion/{Id:int}"
+@inject IGameService gameService
+@inject NavigationManager navigationManager
+@inject IJSRuntime _jsRuntime
+
+<h3>@QuestionItem?.ParticipantName</h3>
+<div class="card" style="width: 18rem;">
+    <img src="@QuestionItem?.Picture" class="card-img-top" alt="...">
+    <div class="card-body">
+        <h5 class="card-title">@QuestionItem?.CategoryTitle</h5>
+        <p class="card-text">@QuestionItem?.Title</p>
+    </div>
+    <ul class="list-group list-group-flush">
+        <li class="list-group-item">@Counter</li>
+        <li class="list-group-item">
+            @AnswerText
+            </li>
+    </ul>
+    <div class="card-body">
+        <button @onclick="(() => SaveResult(true))"
+                class="btn btn-primary sm">
+            Correct
+        </button>
+        <button @onclick="(() => SaveResult(false))"
+                class="btn btn-danger sm">
+            Incorrect
+        </button>
+    </div>
+</div>
+<audio id="sound" autoplay src="media/beep.wav" />
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+    public string ParticipantName { get; set; } = "";
+    public QuestionViewModel QuestionItem { get; set; }
+    public int Counter { get; set; }
+    public bool IsHide { get; set; }
+    public string AnswerText { get; set; } = "Answer?";
+    private static System.Timers.Timer aTimer;
+}
+@functions{
+    protected override async Task OnInitializedAsync()
+    {
+        QuestionItem = await gameService.ShowQuestion(Id);
+        Counter = QuestionItem.Duration;
+        aTimer = new System.Timers.Timer(1000);
+        aTimer.Elapsed += CountDownTimer;
+        aTimer.Enabled = true;
+    }
+    public async void CountDownTimer(Object source, System.Timers.ElapsedEventArgs e)
+    {
+        if (Counter > 0)
+        {
+            Counter -= 1;
+            await _jsRuntime.InvokeAsync<string>("PlayAudio", "sound");
+        }
+        else
+        {
+            aTimer.Enabled = false;
+            AnswerText = QuestionItem.Answer;
+        }
+        InvokeAsync(StateHasChanged);
+    }
+    private async Task SaveResult(bool result)
+    {
+        await gameService.SaveQuestionResult(result, QuestionItem.ParticipantId);
+        navigationManager.NavigateTo($"/GameInfo/{QuestionItem.GameId}");
+    }
+}
