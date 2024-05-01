@@ -13,9 +13,6 @@ namespace GeneralInformationGame.Shared.Data
         }
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            //optionsBuilder.UseSqlServer(
-            //    "Server = WIN-PUD9TJSCPQ8\\SQLEXPRESS;Database = GeneralInformationGame;Trusted_Connection = True;"
-            //    );
             optionsBuilder.UseSqlServer(
                "Server = .;Database = GeneralInformationGame;Trusted_Connection = True;"
                );
