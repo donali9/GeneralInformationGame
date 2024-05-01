@@ -55,13 +55,7 @@ else
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
-//app.UseExceptionHandler("/Error");
-//app.UseHsts();
-//app.UseCors(x => x.WithOrigins("http://localhost:5203", "https://localhost:7213")
-//  .AllowAnyHeader()
-//  .AllowAnyMethod()
-//  .AllowAnyOrigin()
-//);
+
 app.UseHttpsRedirection();
 
 app.UseBlazorFrameworkFiles();
